@@ -1,7 +1,6 @@
 'use client';
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import TaskList from "./components/TaskList";
 
@@ -11,7 +10,7 @@ export default function Home()
   // 定義狀態變數
   const [tasks, setTasks] = useState([]); // 儲存所有任務的陣列
   const [newTask, setNewTask] = useState(''); // 儲存新任務的輸入值
-  const [nextId, setNextId] = useState('1'); 
+  const [nextId, setNextId] = useState(1); 
 
   useEffect(() => {
     const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -25,6 +24,8 @@ export default function Home()
   {
     console.log("Before:", tasks); // 紀錄新增前的任務列表
     console.log("NewTask:", newTask); // 紀錄要新增的任務
+
+    if(newTask.trim() === '') return;
 
     const newTaskObj = {
       id: nextId,
@@ -41,10 +42,15 @@ export default function Home()
   };
 
   const handleDelete = (index) => {
-    const newTask = tasks.filter((_, i) => i !== index);
+    const newTasks = tasks.filter((_, i) => i !== index);
     setTasks(newTasks);
     localStorage.setItem('tasks', JSON.stringify(newTasks));
   }
+  
+  const clearTasks = () => {
+    setTasks([]);
+  }
+  
   // 渲染頁面UI
   return (
     // main 容器: p-4 表示內部padding為4個單位
@@ -67,7 +73,14 @@ export default function Home()
           onClick={addTask}
         >
           Add
-        </button>  
+        </button> 
+        <button
+          // 按鈕樣式: bg-blue-500 藍色背景, text-white 白色文字, px-4 左右padding為4個單位
+          className="bg-red-500 text-white px-4"
+          onClick={clearTasks}
+        >
+          Delete
+        </button> 
       </div>
 
       {/* 引入TaskList組件並傳入任務陣列作為props */}
