@@ -3,30 +3,44 @@
 import {useRouter} from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function TaskDetail({params}) 
+// TaskDetail 組件：顯示和編輯單個任務的詳細資訊
+// params：包含路由參數，其中 id 為當前任務的識別碼
+export default function TaskDetail({params})
 {
+    // 初始化路由器用於頁面導航
     const router = useRouter();
+    // 從路由參數中解構出任務 id
     const {id} = params;
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+    // 使用 useState 管理任務標題和描述
+    const [title, setTitle] = useState('');  // 任務標題
+    const [description, setDescription] = useState('');  // 任務描述
 
+    // 儲存任務更改的處理函數
     const handleSave =() => {
+        // 從 localStorage 獲取現有任務
         const savedTasks = JSON.parse(localStorage.getItem('taskd')) || [];
+        // 更新指定 id 的任務內容
         const updatedTasks = savedTasks.map((task) =>
             task.id === Number(id) ? {...task, title, description} : task
         );
+        // 將更新後的任務列表儲存回 localStorage
         localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+        // 導航回首頁
         router.push('/');
     }
+    // 組件載入時從 localStorage 獲取任務資訊
     useEffect(() => {
+        // 讀取所有已儲存的任務
         const savedTasks = JSON.parse(localStorage.getItem(tasks)) || [];
+        // 查找指定 id 的任務
         const task = savedTasks.find((t) => t.id === Number(id));
+        // 如果找到任務，更新表單狀態
         if(task)
         {
             setTitle(task.title);
             setDescription(task.description);
         }
-    }, [id]);
+    }, [id]);  // 當 id 改變時重新執行
 
     return
     (

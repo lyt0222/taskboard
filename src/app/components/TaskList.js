@@ -1,8 +1,11 @@
 'use client';
 import Link from 'next/link';
+
 // TaskList 組件：負責渲染任務列表
-// 參數 tasks：接收任務陣列作為 props
-export default function TaskList({ tasks, onDelete}) 
+// 參數:
+// - tasks: 任務陣列，包含要顯示的所有任務物件
+// - onDelete: 刪除任務的回調函數，接收任務索引作為參數
+export default function TaskList({ tasks, onDelete})
 {
     return 
     (

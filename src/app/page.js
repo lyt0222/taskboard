@@ -8,47 +8,58 @@ import TaskList from "./components/TaskList";
 export default function Home() 
 {
   // 定義狀態變數
-  const [tasks, setTasks] = useState([]); // 儲存所有任務的陣列
   const [newTask, setNewTask] = useState(''); // 儲存新任務的輸入值
   const [nextId, setNextId] = useState(1); 
 
+  // 初始化時從 localStorage 載入任務數據
   useEffect(() => {
-    const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    setTasks(savedTasks);
-    const maxId = savedTasks.reduce((max, task) => Math.max(max, task.id), 0);
+    // 從 localStorage 讀取已保存的任務，如果沒有則使用空陣列
+    const saveTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    setTasks(saveTasks);
+    // 計算最大任務 ID 以確保新任務 ID 不重複
+    const maxId = saveTasks.reduce((max, task) => Math.max(max, task.id), 0);
     setNextId(maxId + 1);
-  }, []);
+  }, []); // 空依賴數組表示只在組件掛載時執行
+
+  const [tasks, setTasks] = useState([]); // 儲存所有任務的陣列
 
   // 新增任務的處理函數
-  const addTask = () =>
-  {
-    console.log("Before:", tasks); // 紀錄新增前的任務列表
-    console.log("NewTask:", newTask); // 紀錄要新增的任務
-
+  const addTask = () =>{
+    // 防止空白任務的提交
     if(newTask.trim() === '') return;
 
+    // 建立新任務物件
     const newTaskObj = {
       id: nextId,
       title: newTask,
-      description: '',
+      description: '', // 初始描述為空
     };
-    const updatedTasks = [...tasks, newTaskObj]; // 使用展開運算符創建新的任務陣列
-    setTasks(updatedTasks); // 更新任務列表
-    console.log("After;", updatedTasks); // 紀錄新增後的任務列表
+    
+    // 使用展開運算符創建新的任務陣列，保持狀態不可變性
+    const updatedTasks = [...tasks, newTaskObj];
+    
+    // 更新狀態
+    setTasks(updatedTasks);
     setNewTask(''); // 清空輸入欄位
-
-    setNextId(nextId + 1);
+    setNextId(nextId + 1); // 更新下一個可用的 ID
+    
+    // 將更新後的任務列表保存到 localStorage
     localStorage.setItem('task', JSON.stringify(updatedTasks));
   };
 
-  const handleDelete = (index) => {
-    const newTasks = tasks.filter((_, i) => i !== index);
+  // 刪除指定 ID 的任務
+  const handleDelete = (id) => {
+    // 過濾掉要刪除的任務
+    const newTasks = tasks.filter((task) => task.id !== id);
+    // 更新狀態和 localStorage
     setTasks(newTasks);
     localStorage.setItem('tasks', JSON.stringify(newTasks));
   }
   
+  // 清空所有任務
   const clearTasks = () => {
-    setTasks([]);
+    setTasks([]); // 將任務列表設為空陣列
+    localStorage.removeItem('tasks'); // 清除 localStorage 中的任務數據
   }
   
   // 渲染頁面UI
@@ -85,7 +96,6 @@ export default function Home()
 
       {/* 引入TaskList組件並傳入任務陣列作為props */}
       <TaskList tasks={tasks} onDelete={handleDelete} />
-
     </main>
   );
 }
